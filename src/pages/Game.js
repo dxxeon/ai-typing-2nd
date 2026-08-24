@@ -12,29 +12,28 @@ import {
   getDocs,
   query,
   where,
-  orderBy,
 } from "firebase/firestore";
 
 const lineSets = {
   set1: [
     "아이들은 누구나 마음 속에 알을 가지고 있다",
-    // "charac charac change!",
-    // "charac charac change!",
-    // "another character go for you~",
-    // "있는 그대로 나의 모습을 보여주는 게 싫었어",
-    // "하늘의 작은 별들도 제 빛을 비추는데",
-    // "날 몰라줘도 날 오해해도 언젠간 날 보여줄게",
-    // "널 사랑해도 말 못했던 나",
-    // "달라질게 솔직한 날 기대해",
-    // "I can change the charac and motion",
-    // "내가 가진 또 다른 모습",
-    // "숨겨왔었던 모든 내 사랑들을",
-    // "이젠 보여줄 수 있는 걸",
-    // "I can feel the Happy emotion",
-    // "내가 또 다른 사랑 인거야",
-    // "나를 가렸던 기억 이젠 모두 다 바꿔줘",
-    // "charac charac change!",
-    // "행복하도록",
+    "charac charac change!",
+    "charac charac change!",
+    "another character go for you~",
+    "있는 그대로 나의 모습을 보여주는 게 싫었어",
+    "하늘의 작은 별들도 제 빛을 비추는데",
+    "날 몰라줘도 날 오해해도 언젠간 날 보여줄게",
+    "널 사랑해도 말 못했던 나",
+    "달라질게 솔직한 날 기대해",
+    "I can change the charac and motion",
+    "내가 가진 또 다른 모습",
+    "숨겨왔었던 모든 내 사랑들을",
+    "이젠 보여줄 수 있는 걸",
+    "I can feel the Happy emotion",
+    "내가 또 다른 사랑 인거야",
+    "나를 가렸던 기억 이젠 모두 다 바꿔줘",
+    "charac charac change!",
+    "행복하도록",
   ],
   set2: [
     "감옥에~~~서 누가 돌아왔~~~게",
@@ -214,16 +213,15 @@ function Game() {
     try {
       const q = query(
         collection(db, "rankings"),
-        where("setId", "==", setId),
-        orderBy("score", "desc")
+        where("setId", "==", setId)
       );
 
       const querySnapshot = await getDocs(q);
       const allRankings = querySnapshot.docs.map(doc => doc.data());
 
-      const index = allRankings.findIndex(r => (r.score || 0) <= scoreForRank);
+      const higherCount = allRankings.filter(r => (r.score || 0) > scoreForRank).length;
 
-      setMyRank(index === -1 ? allRankings.length + 1 : index + 1);
+      setMyRank(higherCount + 1);
     } catch (e) {
       console.error("등수 계산 오류:", e);
       setMyRank("-");
