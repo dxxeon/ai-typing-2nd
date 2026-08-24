@@ -37,7 +37,6 @@ function Scoreboard() {
   useEffect(() => {
     setRankings([]);
 
-    // rankings 컬렉션은 학번당 최고 기록 1건만 존재하므로 중복 제거가 따로 필요 없습니다.
     const q = query(
       collection(db, "rankings"),
       where("setId", "==", currentTab)
@@ -52,7 +51,6 @@ function Scoreboard() {
     return () => unsubscribe();
   }, [currentTab]);
 
-  // 학과별 평균 점수 집계 (현재 선택된 세트 기준)
   const departmentStats = (() => {
     const groups = {};
     rankings.forEach((r) => {
@@ -76,110 +74,117 @@ function Scoreboard() {
   })();
 
   return (
-    <div style={styles.container}>
-      <div style={styles.titleImgContainer}>
-        <img src="/images/title.png" alt="타이틀" style={styles.titleImg} />
-      </div>
+    <div style={styles.pageWrapper}>
+      <div style={styles.bgFixed} />
+      <div style={styles.container}>
+        <div style={styles.headerSection}>
+          <div style={styles.titleImgContainer}>
+            <img src="/images/title.png" alt="타이틀" style={styles.titleImg} />
+          </div>
 
-      <h1 style={styles.title}>
-        <img src='/images/rankings.png' alt="랭킹-타이틀" style={styles.rankImg} />
-      </h1>
+          <h1 style={styles.title}>
+            <img src='/images/rankings.png' alt="랭킹-타이틀" style={styles.rankImg} />
+          </h1>
 
-      <div style={styles.topBtnGroup}>
-        <button
-          onClick={() => setCurrentTab("set1")}
-          style={currentTab === "set1" ? styles.activeTab : styles.tab}
-        >캐캐체</button>
-        <button
-          onClick={() => setCurrentTab("set2")}
-          style={currentTab === "set2" ? styles.activeTab : styles.tab}
-        >안전귀가</button>
-        <button
-          onClick={() => setCurrentTab("set3")}
-          style={currentTab === "set3" ? styles.activeTab : styles.tab}
-        >척학비</button>
-        <button
-          onClick={() => navigate("/")}
-          style={styles.homeTabBtn}
-        >홈으로</button>
-      </div>
+          <div style={styles.topBtnGroup}>
+            <button
+              onClick={() => setCurrentTab("set1")}
+              style={currentTab === "set1" ? styles.activeTab : styles.tab}
+            >캐캐체</button>
+            <button
+              onClick={() => setCurrentTab("set2")}
+              style={currentTab === "set2" ? styles.activeTab : styles.tab}
+            >안전귀가</button>
+            <button
+              onClick={() => setCurrentTab("set3")}
+              style={currentTab === "set3" ? styles.activeTab : styles.tab}
+            >척학비</button>
+            <button
+              onClick={() => navigate("/")}
+              style={styles.homeTabBtn}
+            >홈으로</button>
+          </div>
 
-      <div style={styles.viewModeGroup}>
-        <button
-          onClick={() => setViewMode("individual")}
-          style={viewMode === "individual" ? styles.activeModeBtn : styles.modeBtn}
-        >개인 랭킹</button>
-        <button
-          onClick={() => setViewMode("department")}
-          style={viewMode === "department" ? styles.activeModeBtn : styles.modeBtn}
-        >학과별 랭킹</button>
-      </div>
+          <div style={styles.viewModeGroup}>
+            <button
+              onClick={() => setViewMode("individual")}
+              style={viewMode === "individual" ? styles.activeModeBtn : styles.modeBtn}
+            >개인 랭킹</button>
+            <button
+              onClick={() => setViewMode("department")}
+              style={viewMode === "department" ? styles.activeModeBtn : styles.modeBtn}
+            >학과별 랭킹</button>
+          </div>
+        </div>
 
-      {viewMode === "individual" ? (
-        <table style={styles.table}>
-          <thead>
-            <tr style={styles.theadRow}>
-              <th>순위</th>
-              <th>아이디</th>
-              <th>소속 학과</th>
-              <th>타수</th>
-              <th>정확도</th>
-              <th>기록 일시</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {rankings.map((r, i) => {
-              const isValidScore = (r.accuracy >= 60) && (r.speed > 0);
-
-              return (
-                <tr
-                  key={r.id}
-                  style={{
-                    ...styles.tr,
-                    ...(i === 0 && isValidScore ? styles.first : {})
-                  }}>
-                  <td>{isValidScore ? i + 1 : "-"}</td>
-                  <td>{r.name || "익명"}</td>
-                  <td>{r.group || "무소속"}</td>
-                  <td>{Math.round(r.speed || 0)}</td>
-                  <td>{r.accuracy ? r.accuracy.toFixed(1) : "0.0"}%</td>
-                  <td style={styles.timeCell}>{formatDateTime(r.timestamp)}</td>
+        <div className="scoreboard-scroll-area" style={styles.scrollArea}>
+          {viewMode === "individual" ? (
+            <table style={styles.table}>
+              <thead>
+                <tr style={styles.theadRow}>
+                  <th>순위</th>
+                  <th>아이디</th>
+                  <th>소속 학과</th>
+                  <th>타수</th>
+                  <th>정확도</th>
+                  <th>기록 일시</th>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      ) : (
-        <table style={styles.table}>
-          <thead>
-            <tr style={styles.theadRow}>
-              <th>순위</th>
-              <th>학과</th>
-              <th>평균 점수</th>
-              <th>참여 인원</th>
-            </tr>
-          </thead>
-          <tbody>
-            {departmentStats.map((d, i) => (
-              <tr key={d.group} style={{ ...styles.tr, ...(i === 0 ? styles.first : {}) }}>
-                <td>{i + 1}</td>
-                <td>{d.group}</td>
-                <td>{Math.round(d.avgScore)}</td>
-                <td>{d.count}명</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+              </thead>
 
-      {viewMode === "individual" && rankings.length === 0 && (
-        <p style={{ marginTop: "20px", color: "#888" }}>아직 기록이 없습니다.</p>
-      )}
-      {viewMode === "department" && departmentStats.length === 0 && (
-        <p style={{ marginTop: "20px", color: "#888" }}>아직 기록이 없습니다.</p>
-      )}
-      <Footer />
+              <tbody>
+                {rankings.map((r, i) => {
+                  const isValidScore = (r.accuracy >= 60) && (r.speed > 0);
+
+                  return (
+                    <tr
+                      key={r.id}
+                      style={{
+                        ...styles.tr,
+                        ...(i === 0 && isValidScore ? styles.first : {})
+                      }}>
+                      <td>{isValidScore ? i + 1 : "-"}</td>
+                      <td>{r.name || "익명"}</td>
+                      <td>{r.group || "무소속"}</td>
+                      <td>{Math.round(r.speed || 0)}</td>
+                      <td>{r.accuracy ? r.accuracy.toFixed(1) : "0.0"}%</td>
+                      <td style={styles.timeCell}>{formatDateTime(r.timestamp)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          ) : (
+            <table style={styles.table}>
+              <thead>
+                <tr style={styles.theadRow}>
+                  <th>순위</th>
+                  <th>학과</th>
+                  <th>평균 점수</th>
+                  <th>참여 인원</th>
+                </tr>
+              </thead>
+              <tbody>
+                {departmentStats.map((d, i) => (
+                  <tr key={d.group} style={{ ...styles.tr, ...(i === 0 ? styles.first : {}) }}>
+                    <td>{i + 1}</td>
+                    <td>{d.group}</td>
+                    <td>{Math.round(d.avgScore)}</td>
+                    <td>{d.count}명</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          {viewMode === "individual" && rankings.length === 0 && (
+            <p style={{ marginTop: "20px", color: "#888" }}>아직 기록이 없습니다.</p>
+          )}
+          {viewMode === "department" && departmentStats.length === 0 && (
+            <p style={{ marginTop: "20px", color: "#888" }}>아직 기록이 없습니다.</p>
+          )}
+          <Footer />
+        </div>
+      </div>
     </div>
   );
 }
@@ -202,11 +207,24 @@ const styles = {
   },
   container: {
     position: "relative",
-    padding: "40px 20px",
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+    overflow: "hidden",
+    padding: "40px 20px 0",
     textAlign: "center",
     fontFamily: "Pretendard, sans-serif",
-    minHeight: "100vh",
-    justifyContent: 'center', alignItems: 'center', flexDirection: 'column'
+    boxSizing: "border-box",
+  },
+  headerSection: {
+    flexShrink: 0,
+  },
+  scrollArea: {
+    flex: 1,
+    overflowY: "auto",
+    paddingBottom: "40px",
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
   },
   titleImgContainer: {
     display: "flex",
