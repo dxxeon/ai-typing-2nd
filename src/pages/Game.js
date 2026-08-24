@@ -30,7 +30,7 @@ const lineSets = {
     "숨겨왔었던 모든 내 사랑들을",
     "이젠 보여줄 수 있는 걸",
     "I can feel the Happy emotion",
-    "내가 또 다른 사랑 인거야",
+    "내가 또 다른 사랑인 거야",
     "나를 가렸던 기억 이젠 모두 다 바꿔줘",
     "charac charac change!",
     "행복하도록",
@@ -120,7 +120,7 @@ function Game() {
   const isComposingRef = useRef(false);
 
   const setNames = {
-    set1: "캐캐체", set2: "공주님의 안전귀가를 위하여", set3: "척학비"
+    set1: "캐캐체", set2: "안전귀가", set3: "척학비"
   }
 
   // -----------------------------
