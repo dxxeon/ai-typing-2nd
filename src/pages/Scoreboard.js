@@ -185,14 +185,28 @@ function Scoreboard() {
 }
 
 const styles = {
+  pageWrapper: {
+    position: "relative",
+    minHeight: "100vh",
+  },
+  bgFixed: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    backgroundImage: "url('/images/bg2.png')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    zIndex: -1,
+  },
   container: {
+    position: "relative",
     padding: "40px 20px",
     textAlign: "center",
     fontFamily: "Pretendard, sans-serif",
-    backgroundColor: "#f0f2f5",
     minHeight: "100vh",
-    backgroundImage: "url('/images/bg2.png')",
-    backgroundSize: 'cover', backgroundPosition: 'center', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'
+    justifyContent: 'center', alignItems: 'center', flexDirection: 'column'
   },
   titleImgContainer: {
     display: "flex",
