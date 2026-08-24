@@ -211,7 +211,7 @@ const styles = {
     flexDirection: "column",
     height: "100vh",
     overflow: "hidden",
-    padding: "40px 20px 0",
+    padding: "20px 20px 0",
     textAlign: "center",
     fontFamily: "Pretendard, sans-serif",
     boxSizing: "border-box",
@@ -231,7 +231,7 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
-    marginTop: "50px"
+    marginTop: "30px"
   },
   titleImg: {
     width: "450px",
@@ -249,7 +249,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     gap: "10px",
-    marginBottom: "15px",
+    marginBottom: "16px",
     maxWidth: "800px",
     margin: "0 auto 15px auto"
   },
@@ -320,7 +320,7 @@ const styles = {
   },
   title: {
     fontSize: "28px", fontFamily: "pixelroborobo",
-    marginBottom: "50px",
+    marginBottom: "10px",
     fontWeight: "800",
     color: "#333"
   },
