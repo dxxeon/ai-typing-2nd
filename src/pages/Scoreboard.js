@@ -5,7 +5,6 @@ import { db } from "../firebase";
 import {
   collection,
   query,
-  orderBy,
   onSnapshot,
   where
 } from "firebase/firestore";
@@ -14,6 +13,7 @@ function Scoreboard() {
   const navigate = useNavigate();
   const [rankings, setRankings] = useState([]);
   const [currentTab, setCurrentTab] = useState("set1");
+  const [viewMode, setViewMode] = useState("individual"); // "individual" | "department"
 
   const formatDateTime = (timestamp) => {
     if (!timestamp) return "-";
@@ -37,33 +37,43 @@ function Scoreboard() {
   useEffect(() => {
     setRankings([]);
 
+    // rankings 컬렉션은 학번당 최고 기록 1건만 존재하므로 중복 제거가 따로 필요 없습니다.
     const q = query(
       collection(db, "rankings"),
       where("setId", "==", currentTab)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => {
-        const item = doc.data();
-        
-        const calculatedScore = item.accuracy < 60 
-          ? 0 
-          : (item.speed || 0) * Math.pow((item.accuracy || 0) / 100, 1.3);
-
-        return {
-          id: doc.id,
-          ...item,
-          adjustedScore: calculatedScore
-        };
-      });
-
-      const sortedData = data.sort((a, b) => b.adjustedScore - a.adjustedScore);
-      
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const sortedData = data.sort((a, b) => (b.score || 0) - (a.score || 0));
       setRankings(sortedData);
     });
 
     return () => unsubscribe();
   }, [currentTab]);
+
+  // 학과별 평균 점수 집계 (현재 선택된 세트 기준)
+  const departmentStats = (() => {
+    const groups = {};
+    rankings.forEach((r) => {
+      const groupName = r.group || "무소속";
+      if (!groups[groupName]) {
+        groups[groupName] = { group: groupName, totalScore: 0, totalAccuracy: 0, count: 0 };
+      }
+      groups[groupName].totalScore += r.score || 0;
+      groups[groupName].totalAccuracy += r.accuracy || 0;
+      groups[groupName].count += 1;
+    });
+
+    return Object.values(groups)
+      .map((g) => ({
+        group: g.group,
+        avgScore: g.totalScore / g.count,
+        avgAccuracy: g.totalAccuracy / g.count,
+        count: g.count,
+      }))
+      .sort((a, b) => b.avgScore - a.avgScore);
+  })();
 
   return (
     <div style={styles.container}>
@@ -76,65 +86,97 @@ function Scoreboard() {
       </h1>
 
       <div style={styles.topBtnGroup}>
-        <button 
-          onClick={() => setCurrentTab("set1")} 
+        <button
+          onClick={() => setCurrentTab("set1")}
           style={currentTab === "set1" ? styles.activeTab : styles.tab}
-        >애국가</button>
-        <button 
-          onClick={() => setCurrentTab("set2")} 
+        >캐캐체</button>
+        <button
+          onClick={() => setCurrentTab("set2")}
           style={currentTab === "set2" ? styles.activeTab : styles.tab}
-        >인공지능대학</button>
-        <button 
-          onClick={() => setCurrentTab("set3")} 
+        >안전귀가</button>
+        <button
+          onClick={() => setCurrentTab("set3")}
           style={currentTab === "set3" ? styles.activeTab : styles.tab}
-        >이누공</button>
-        <button 
-          onClick={() => navigate("/")} 
+        >척학비</button>
+        <button
+          onClick={() => navigate("/")}
           style={styles.homeTabBtn}
         >홈으로</button>
       </div>
 
-      {/* <h1 style={styles.title}> {
-        currentTab === "set1" ? "애국가" : 
-        currentTab === "set2" ? "인공지능대학" : "set3"
-      } 전체 랭킹</h1> */}
+      <div style={styles.viewModeGroup}>
+        <button
+          onClick={() => setViewMode("individual")}
+          style={viewMode === "individual" ? styles.activeModeBtn : styles.modeBtn}
+        >개인 랭킹</button>
+        <button
+          onClick={() => setViewMode("department")}
+          style={viewMode === "department" ? styles.activeModeBtn : styles.modeBtn}
+        >학과별 랭킹</button>
+      </div>
 
-      <table style={styles.table}>
-        <thead>
-          <tr style={styles.theadRow}>
-            <th>순위</th>
-            <th>닉네임</th>
-            <th>소속 학과</th>
-            <th>타수</th>
-            <th>정확도</th>
-            <th>기록 일시</th>
-          </tr>
-        </thead>
+      {viewMode === "individual" ? (
+        <table style={styles.table}>
+          <thead>
+            <tr style={styles.theadRow}>
+              <th>순위</th>
+              <th>아이디</th>
+              <th>소속 학과</th>
+              <th>타수</th>
+              <th>정확도</th>
+              <th>기록 일시</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          {rankings.map((r, i) => {
-            const isValidScore = (r.accuracy >= 60) && (r.speed > 0);
-    
-            return (
-              <tr
-                key={r.id}
-                style={{
-                  ...styles.tr,
-                  ...(i === 0 && isValidScore ? styles.first : {})
-                }}>
-                <td>{isValidScore ? i + 1 : "-"}</td>
-                <td>{r.name || "익명"}</td>
-                <td>{r.group || "무소속"}</td>
-                <td>{Math.round(r.speed || 0)}</td>
-                <td>{r.accuracy ? r.accuracy.toFixed(1) : "0.0"}%</td>
-                <td style={styles.timeCell}>{formatDateTime(r.timestamp || r.createdAt)}</td>
-             </tr>
-    );
-  })}
-        </tbody>
-      </table>
+          <tbody>
+            {rankings.map((r, i) => {
+              const isValidScore = (r.accuracy >= 60) && (r.speed > 0);
 
-      {rankings.length === 0 && (
+              return (
+                <tr
+                  key={r.id}
+                  style={{
+                    ...styles.tr,
+                    ...(i === 0 && isValidScore ? styles.first : {})
+                  }}>
+                  <td>{isValidScore ? i + 1 : "-"}</td>
+                  <td>{r.name || "익명"}</td>
+                  <td>{r.group || "무소속"}</td>
+                  <td>{Math.round(r.speed || 0)}</td>
+                  <td>{r.accuracy ? r.accuracy.toFixed(1) : "0.0"}%</td>
+                  <td style={styles.timeCell}>{formatDateTime(r.timestamp)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      ) : (
+        <table style={styles.table}>
+          <thead>
+            <tr style={styles.theadRow}>
+              <th>순위</th>
+              <th>학과</th>
+              <th>평균 점수</th>
+              <th>참여 인원</th>
+            </tr>
+          </thead>
+          <tbody>
+            {departmentStats.map((d, i) => (
+              <tr key={d.group} style={{ ...styles.tr, ...(i === 0 ? styles.first : {}) }}>
+                <td>{i + 1}</td>
+                <td>{d.group}</td>
+                <td>{Math.round(d.avgScore)}</td>
+                <td>{d.count}명</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      {viewMode === "individual" && rankings.length === 0 && (
+        <p style={{ marginTop: "20px", color: "#888" }}>아직 기록이 없습니다.</p>
+      )}
+      {viewMode === "department" && departmentStats.length === 0 && (
         <p style={{ marginTop: "20px", color: "#888" }}>아직 기록이 없습니다.</p>
       )}
       <Footer />
@@ -154,8 +196,8 @@ const styles = {
   },
   titleImgContainer: {
     display: "flex",
-    justifyContent: "center", 
-    alignItems: "center",    
+    justifyContent: "center",
+    alignItems: "center",
     width: "100%",
     marginTop: "50px"
   },
@@ -175,8 +217,16 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     gap: "10px",
-    marginBottom: "30px",
+    marginBottom: "15px",
     maxWidth: "800px",
+    margin: "0 auto 15px auto"
+  },
+  viewModeGroup: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "10px",
+    marginBottom: "30px",
+    maxWidth: "400px",
     margin: "0 auto 30px auto"
   },
   tab: {
@@ -214,6 +264,28 @@ const styles = {
     cursor: "pointer",
     fontWeight: "bold"
   },
+  modeBtn: {
+    flex: 1,
+    padding: "10px",
+    fontSize: "14px", fontFamily: "Galmuri11",
+    backgroundColor: "white",
+    color: "#555",
+    border: "1px solid #ddd",
+    borderRadius: "20px",
+    cursor: "pointer",
+    fontWeight: "600",
+  },
+  activeModeBtn: {
+    flex: 1,
+    padding: "10px",
+    fontSize: "14px", fontFamily: "Galmuri11",
+    backgroundColor: "#333",
+    color: "white",
+    border: "1px solid #333",
+    borderRadius: "20px",
+    cursor: "pointer",
+    fontWeight: "bold",
+  },
   title: {
     fontSize: "28px", fontFamily: "pixelroborobo",
     marginBottom: "50px",
@@ -240,7 +312,7 @@ const styles = {
     height: "50px", fontFamily: "Galmuri9",
   },
   first: {
-    backgroundColor: "#fff9c4", // 1등 강조 색상
+    backgroundColor: "#fff9c4",
     fontWeight: "bold", fontFamily: "Galmuri9",
   },
   timeCell: {
