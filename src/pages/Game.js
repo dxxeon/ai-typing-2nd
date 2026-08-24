@@ -12,7 +12,6 @@ import {
   getDocs,
   query,
   where,
-  orderBy,
 } from "firebase/firestore";
 
 const lineSets = {
@@ -214,16 +213,15 @@ function Game() {
     try {
       const q = query(
         collection(db, "rankings"),
-        where("setId", "==", setId),
-        orderBy("score", "desc")
+        where("setId", "==", setId)
       );
 
       const querySnapshot = await getDocs(q);
       const allRankings = querySnapshot.docs.map(doc => doc.data());
 
-      const index = allRankings.findIndex(r => (r.score || 0) <= scoreForRank);
+      const higherCount = allRankings.filter(r => (r.score || 0) > scoreForRank).length;
 
-      setMyRank(index === -1 ? allRankings.length + 1 : index + 1);
+      setMyRank(higherCount + 1);
     } catch (e) {
       console.error("등수 계산 오류:", e);
       setMyRank("-");
