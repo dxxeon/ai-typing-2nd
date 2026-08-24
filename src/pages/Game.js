@@ -2,38 +2,84 @@ import React, { useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 
-import {db} from "../firebase";
-import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy } from "firebase/firestore";
+import { db } from "../firebase";
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  doc,
+  serverTimestamp,
+  getDocs,
+  query,
+  where,
+  orderBy,
+} from "firebase/firestore";
 
 const lineSets = {
-  set1: ["동해물과 백두산이 마르고 닳도록",
-  "하느님이 보우하사 우리나라 만세",
-  "무궁화 삼천리 화려강산",
-  "대한사람 대한으로 길이 보전하세",
-  "남산 위에 저 소나무 철갑을 두른 듯",
-  "바람 서리 불변함은 우리 기상일세",
-  "무궁화 삼천리 화려강산",
-  "대한사람 대한으로 길이 보전하세",
-  "가을 하늘 공활한데 높고 구름 없이",
-  "밝은 달은 우리 가슴 일편단심일세",
-  "무궁화 삼천리 화려강산",
-  "대한사람 대한으로 길이 보전하세",
-  "이 기상과 이 맘으로 충성을 다하여",
-  "괴로우나 즐거우나 나라 사랑하세",
-  "무궁화 삼천리 화려강산",
-  "대한사람 대한으로 길이 보전하세"],
-  set2: ["<4차 산업혁명 시대를 주도할 여성 AI 인재 양성>",
-    "이라는 시대적 소명 아래, 본교는 AI 분야 교육 및", "연구를 선도하기 위하여 인공지능대학을 설립하였습니다.", "인공지능대학은 통찰력과 전문성을 갖춘 AI 인재 양성을", "목표로 현재 2개 학과(컴퓨터공학과, 사이버보안학과),", "1개 학부 및 2개 전공(인공지능데이터사이언스학부", "인공지능전공, 데이터사이언스전공)으로 운영하고 있습니다.","인공지능대학은 이화만의 특화된 AI 분야에 대한", "집중 투자를 통하여, 해당 분야의 독보적인 교육 및", "연구 환경을 조성함으로써 세계적인 전문 인력을", "양성하고 AI와 함께하는 미래를 준비하는", "최전방 대학으로 자리매김할 것입니다."],
-  set3: ["어려분 단체방에 죄송하지만 글 하나만 젇겠습니다.", "안녕래은아너를처음본순간부터좋아했어",
-    "방학전에고백하고싶었는데바보같이그땐용기가없더라", "지금은이수많은사람들앞에서오로지너만사랑한다고말하고싶어서", "큰마음먹고용기내어봐매일매일버스에서너볼때마다", "두근댔고동아리랑과활동에서도너만보이고너생각만나고", "지난3월부터계속그랬어니가남자친구랑헤어지고", "니맘이아파울때내마음도너무아팠지만내심좋은맘두있었어", "이런내맘을어떻게말할지고민하다가정말인생에서제일크게",
-    "용기내어세상에서제일멋지게많은사람들앞에서", "너한테고백해주고싶었어사랑하는래은님", "내여자가되줄래?아니나만의태양이되어줄래?", "난너의달님이될게", "내일3시반에너수업마치고학관앞에서기다리고있을게", "너를사랑하는화연이가", "이제누가공지해주냐"
-  ]
+  set1: [
+    "아이들은 누구나 마음 속에 알을 가지고 있다",
+    // "charac charac change!",
+    // "charac charac change!",
+    // "another character go for you~",
+    // "있는 그대로 나의 모습을 보여주는 게 싫었어",
+    // "하늘의 작은 별들도 제 빛을 비추는데",
+    // "날 몰라줘도 날 오해해도 언젠간 날 보여줄게",
+    // "널 사랑해도 말 못했던 나",
+    // "달라질게 솔직한 날 기대해",
+    // "I can change the charac and motion",
+    // "내가 가진 또 다른 모습",
+    // "숨겨왔었던 모든 내 사랑들을",
+    // "이젠 보여줄 수 있는 걸",
+    // "I can feel the Happy emotion",
+    // "내가 또 다른 사랑 인거야",
+    // "나를 가렸던 기억 이젠 모두 다 바꿔줘",
+    // "charac charac change!",
+    // "행복하도록",
+  ],
+  set2: [
+    "감옥에~~~서 누가 돌아왔~~~게",
+    "혹시... 자기야? 드디어 출소한 거야?",
+    "그래!!! 검은 흑곰이 돌아왔다",
+    "자기야... 너무 보고싶었어...",
+    "16년간 단 하루도 자기를 잊은 적이 없어.",
+    "피로 네 얼굴을 매일같이 그렸지.",
+    "맞아, 자긴 끔찍한 범죄를 저질렀지.",
+    "키 2미터 13센치에 몸무게 200키로를 건드린 죄지.",
+    "역시 나만의 야만인이야.",
+    "지금 어디야!!!",
+    "이제 택시 타고 집 가는 중.",
+    "그래그래그래!!!",
+    "근데, 집 가는 방향이 아닌...",
+    "기사님 바꿔!!!",
+    "이제 일반인은 해치지 않기로 했잖아!!",
+    "그래그래, 그래그래...",
+    "또 감옥에 가고 싶은 거야?",
+    "약속했었지...",
+    "그래도 걱정해주니까 좋다 ㅎㅎ",
+    "단 하나만 기억해.",
+    "검은 흑곰은 피에 굶주려 있다는 사실을.",
+  ],
+  set3: [
+    "오호 통재라!",
+    "만천하 벗들에게 피를 토하는 심정으로 엄히 고하노라.",
+    "근래 대이화의 굳건한 기강을 뒤흔드는 요망한 무리들이 창궐하니,",
+    "이른바 앞에서는 백지를 주창하면서 뒤로는 아산당과 이시시 구석에서",
+    "전공 서책을 펼치는 참람한 뒷공부 무리로다.",
+    "음흉히 뒷공부를 하는 것은 곧 학업이라는 오랑캐와 화친하는 것이요",
+    "달콤한 화친에 속아 몰래 책을 펴는 것은, 함께 붓을 꺾기로 맹세한",
+    "벗들을 배신하고 평균을 높이는 참담한 매학 행위로다.",
+    "대저 학업이라 함은 우리의 평안과 젊음을 갉아먹는 간악한 외세이거늘,",
+    "어찌하여 입으로는 망하였다 하면서 야반심경에 홀로 족보를 암송한단 말이더냐.",
+    "진정 시험을 버린 자라면 마땅히 책을 불태우고",
+    "조용히 재수강의 길을 걸어야 할 터.",
+    "이에 본인은 위정척학의 결기로 선포하노라.",
+  ],
 };
 
 // 한글 분해 로직
-const CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
-const JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
-const JONG = ['', 'ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const CHO = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+const JUNG = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
+const JONG = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
 
 function splitString(str) {
   if (!str) return [];
@@ -51,7 +97,8 @@ function splitString(str) {
 function Game() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { name, group, setId } = location.state || {name: "none", group: "none", setId: "set1"};
+  const { studentId, name, group, setId } =
+    location.state || { studentId: "", name: "none", group: "none", setId: "set1" };
   const lines = lineSets[setId] || lineSets.set1;
 
   const [currentLine, setCurrentLine] = useState(0);
@@ -67,29 +114,66 @@ function Game() {
   const [accuracy, setAccuracy] = useState(100);
 
   const [myRank, setMyRank] = useState("-");
+  const [isNewBest, setIsNewBest] = useState(true);
+  const [bestScore, setBestScore] = useState(0);
 
   const inputRef = useRef(null);
+  const isComposingRef = useRef(false);
 
   const setNames = {
-    set1: "애국가", set2: "인공지능대학", set3: "이누공"
+    set1: "캐캐체", set2: "공주님의 안전귀가를 위하여", set3: "척학비"
   }
 
-  // firebase score 저장 함수
-  const saveScore = async (rawSpeed, finalAcc) => {
-    const adjustedScore = rawSpeed * Math.pow(finalAcc / 100, 1.3);
+  // -----------------------------
+  // 학번 기준 "최고 기록만 유지" 저장 함수
+  // -----------------------------
+  const saveOrUpdateBestScore = async (rawSpeed, finalAcc) => {
+    const adjustedScore = Math.round(rawSpeed * Math.pow(finalAcc / 100, 1.3));
+
     try {
-      await addDoc(collection(db, "rankings"), {
-        name: name || "none",
-        group: group || "none",
-        speed: Math.round(rawSpeed),
-        accuracy: Number(finalAcc.toFixed(1)),
-        score: Math.round(adjustedScore),
-        setId: setId || "set1",
-        timestamp: serverTimestamp()
-      });
-      console.log("스코어 저장 완료");
+      const q = query(
+        collection(db, "rankings"),
+        where("studentId", "==", studentId),
+        where("setId", "==", setId)
+      );
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        await addDoc(collection(db, "rankings"), {
+          studentId,
+          name: name || "익명",
+          group: group || "무소속",
+          speed: Math.round(rawSpeed),
+          accuracy: Number(finalAcc.toFixed(1)),
+          score: adjustedScore,
+          setId: setId || "set1",
+          timestamp: serverTimestamp(),
+        });
+        console.log("스코어 저장 완료 (신규)");
+        return { isNewBest: true, bestScore: adjustedScore };
+      }
+
+      const existingDoc = snap.docs[0];
+      const existingScore = existingDoc.data().score || 0;
+
+      if (adjustedScore > existingScore) {
+        await updateDoc(doc(db, "rankings", existingDoc.id), {
+          name: name || "익명",
+          group: group || "무소속",
+          speed: Math.round(rawSpeed),
+          accuracy: Number(finalAcc.toFixed(1)),
+          score: adjustedScore,
+          timestamp: serverTimestamp(),
+        });
+        console.log("스코어 저장 완료 (갱신)");
+        return { isNewBest: true, bestScore: adjustedScore };
+      }
+
+      console.log("기존 최고 기록 유지 (이번 기록이 더 낮음)");
+      return { isNewBest: false, bestScore: existingScore };
     } catch (error) {
       console.error("스코어 저장 오류:", error);
+      return { isNewBest: false, bestScore: 0 };
     }
   };
 
@@ -105,7 +189,7 @@ function Game() {
 
     const currentInputJamo = splitString(currentInput);
     const currentTargetJamo = splitString(lines[currentLine] || "");
-    
+
     let currentLineErrors = 0;
     currentInputJamo.forEach((jamo, i) => {
       if (jamo !== currentTargetJamo[i]) currentLineErrors++;
@@ -121,30 +205,24 @@ function Game() {
     setAccuracy(acc);
   };
 
-  const calculateRank = async (finalSpeed, finalAcc) => {
+  const calculateRank = async (scoreForRank, finalAcc) => {
     if (finalAcc < 60) {
       setMyRank("-");
       return;
     }
 
-    // 조정 타수(내 점수) 계산
-    const myScore = Math.round(finalSpeed * Math.pow(finalAcc / 100, 1.3));
-
     try {
       const q = query(
         collection(db, "rankings"),
         where("setId", "==", setId),
-        orderBy("score", "desc") // 타수/정확도 따로가 아닌 'score'로 정렬
+        orderBy("score", "desc")
       );
-      
+
       const querySnapshot = await getDocs(q);
       const allRankings = querySnapshot.docs.map(doc => doc.data());
-      
-      // 내 점수(myScore)보다 높은 점수를 가진 사람의 수를 찾음
-      // findIndex는 0부터 시작하므로 +1을 해줍니다.
-      const index = allRankings.findIndex(r => (r.score || 0) <= myScore);
-      
-      // 만약 내 점수가 꼴찌보다 낮으면 전체 인원수 + 1
+
+      const index = allRankings.findIndex(r => (r.score || 0) <= scoreForRank);
+
       setMyRank(index === -1 ? allRankings.length + 1 : index + 1);
     } catch (e) {
       console.error("등수 계산 오류:", e);
@@ -159,50 +237,56 @@ function Game() {
     e.preventDefault();
     alert("복붙 금지! 직접 입력해 주세요.");
   };
-  
+
   const handleInputChange = (e) => {
     if (isFinished) return;
     const val = e.target.value;
-    
-    // 첫 입력 시 시작 시간 설정
+
     if (!startTime && val.length > 0) {
       setStartTime(Date.now());
     }
-    
+
     setInput(val);
     updateMetrics(val);
   };
 
+  const handleCompositionStart = () => {
+    isComposingRef.current = true;
+  };
+  const handleCompositionEnd = () => {
+    setTimeout(() => {
+      isComposingRef.current = false;
+    }, 0);
+  };
+
   const handleKeyDown = (e) => {
-  if (e.key === "Enter") {
+    if (e.key !== "Enter") return;
+
+    if (e.nativeEvent.isComposing || isComposingRef.current || e.keyCode === 229) {
+      return;
+    }
+
     e.preventDefault();
 
-    // 1. 현재 쳐야 할 문장과 입력한 문장을 자모 단위로 분해
+    if (input.trim().length === 0) {
+      return;
+    }
+
     const currentTargetJamo = splitString(lines[currentLine] || "");
     const currentInputJamo = splitString(input);
 
     let lineErrors = 0;
-
-    // 2. 빈 입력인 경우: 해당 문장의 모든 자모를 에러로 처리
-    if (input.trim().length === 0) {
-      lineErrors = currentTargetJamo.length;
-    } else {
-      // 3. 내용이 있는 경우: 대상 문장과 입력 문장 중 더 긴 것을 기준으로 비교
-      // (이렇게 해야 문장을 다 안 채우고 엔터 쳤을 때 남은 글자들이 오답 처리됨)
-      const maxLength = Math.max(currentTargetJamo.length, currentInputJamo.length);
-      for (let i = 0; i < maxLength; i++) {
-        if (currentInputJamo[i] !== currentTargetJamo[i]) {
-          lineErrors++;
-        }
+    const maxLength = Math.max(currentTargetJamo.length, currentInputJamo.length);
+    for (let i = 0; i < maxLength; i++) {
+      if (currentInputJamo[i] !== currentTargetJamo[i]) {
+        lineErrors++;
       }
     }
 
-    // 4. 누적 데이터 계산 (빈 입력 시에는 대상 문장의 길이를 더해줌)
-    const nextJamoCount = accJamoCount + (input.length === 0 ? currentTargetJamo.length : currentInputJamo.length);
+    const nextJamoCount = accJamoCount + currentInputJamo.length;
     const nextErrors = accErrors + lineErrors;
 
     if (currentLine === lines.length - 1) {
-      // 마지막 줄인 경우 게임 종료 처리
       const endTime = Date.now();
       const totalTimeSeconds = (endTime - (startTime || endTime)) / 1000;
       setFinalElapsed(totalTimeSeconds);
@@ -211,26 +295,22 @@ function Game() {
       const rawSpeed = nextJamoCount / finalMinutes;
       const finalAcc = ((nextJamoCount - nextErrors) / nextJamoCount) * 100;
 
-      const adjustedSpeed = rawSpeed * Math.pow(finalAcc / 100, 1.3);
-
-      // 상태 업데이트
       setSpeed(rawSpeed);
       setAccuracy(finalAcc);
       setIsFinished(true);
 
-      // 💡 중요: 비동기 업데이트를 기다리지 않고 계산된 최종값으로 바로 저장
-      saveScore(rawSpeed, finalAcc).then(() => {
-          calculateRank(rawSpeed, finalAcc);
+      saveOrUpdateBestScore(rawSpeed, finalAcc).then(({ isNewBest: newBest, bestScore: best }) => {
+        setIsNewBest(newBest);
+        setBestScore(best);
+        calculateRank(best, finalAcc);
       });
     } else {
-      // 다음 줄로 이동
       setAccJamoCount(nextJamoCount);
       setAccErrors(nextErrors);
       setCurrentLine(prev => prev + 1);
       setInput("");
     }
-  }
-};
+  };
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -256,7 +336,7 @@ function Game() {
 
   return (
     <div style={styles.container} onClick={() => inputRef.current?.focus()}>
-      <div style={styles.userInfo}>{name} / {group}</div>
+      <div style={styles.userInfo}>{studentId} · {name} / {group}</div>
 
       <div style={styles.gameBox}>
         <div style={styles.subBox}>{lines[currentLine - 1] || ""}</div>
@@ -271,6 +351,8 @@ function Game() {
             value={input}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
+            onCompositionStart={handleCompositionStart}
+            onCompositionEnd={handleCompositionEnd}
             onPaste={preventCopyPaste}
             onContextMenu={(e) => e.preventDefault()}
             style={styles.hiddenInput}
@@ -291,19 +373,24 @@ function Game() {
       {isFinished && (
         <div style={styles.modalOverlay}>
           <div style={styles.modal}>
-            <h2 style={{textAlign: 'center', fontFamily: 'Galmuri11'}}>게임 종료</h2>
-            <div style={styles.resultRow}><span>닉네임</span> <b>{name}</b></div>
+            <h2 style={{ textAlign: 'center', fontFamily: 'Galmuri11' }}>게임 종료</h2>
+            <div style={styles.resultRow}><span>학번</span> <b>{studentId}</b></div>
+            <div style={styles.resultRow}><span>아이디</span> <b>{name}</b></div>
             <div style={styles.resultRow}><span>소속 학과</span> <b>{group}</b></div>
-            <div style={styles.resultRow}><span>최종 타수</span> <b style={{color: '#c36fff'}}>{Math.round(speed)}</b></div>
-            <div style={styles.resultRow}><span>최종 정확도</span> <b style={{color: '#c36fff'}}>{accuracy.toFixed(1)}%</b></div>
-            <div style={styles.resultRow}><span>소요 시간</span> <b style={{color: 'black'}}>{formatTime(finalElapsed)}</b></div>
+            <div style={styles.resultRow}><span>이번 기록 타수</span> <b style={{ color: '#c36fff' }}>{Math.round(speed)}</b></div>
+            <div style={styles.resultRow}><span>이번 기록 정확도</span> <b style={{ color: '#c36fff' }}>{accuracy.toFixed(1)}%</b></div>
+            <div style={styles.resultRow}><span>소요 시간</span> <b style={{ color: 'black' }}>{formatTime(finalElapsed)}</b></div>
             <div style={styles.resultRow}> <span>세트</span> <b>{setNames[setId] || "세트명"}</b> </div>
+            <div style={styles.resultRow}><span>내 최고 점수</span> <b>{bestScore}</b></div>
+            {!isNewBest && (
+              <div style={styles.noticeRow}>이전 최고 기록이 더 높아 랭킹은 갱신되지 않았어요</div>
+            )}
             <div style={styles.rankHighlight}><span>내 순위</span><b>{myRank} 위</b></div>
             <div style={styles.btnGroup}>
-              <button onClick={() => window.location.reload()} style={{...styles.btn, fontFamily: 'Galmuri11'}}>다시 하기</button>
-              <button onClick={() => navigate("/")} style={{...styles.btn, fontFamily: 'Galmuri11', backgroundColor: "#6c757d"}}>홈</button>
-              <button onClick={() => navigate("/scoreboard")} style={{...styles.btn, fontFamily: 'Galmuri11', backgroundColor: "#c36fff"}}>스코어보드</button>
-</div>
+              <button onClick={() => window.location.reload()} style={{ ...styles.btn, fontFamily: 'Galmuri11' }}>다시 하기</button>
+              <button onClick={() => navigate("/")} style={{ ...styles.btn, fontFamily: 'Galmuri11', backgroundColor: "#6c757d" }}>홈</button>
+              <button onClick={() => navigate("/scoreboard")} style={{ ...styles.btn, fontFamily: 'Galmuri11', backgroundColor: "#c36fff" }}>스코어보드</button>
+            </div>
           </div>
         </div>
       )}
@@ -319,18 +406,20 @@ function Game() {
 }
 
 const styles = {
-  container: { padding: "60px 20px", fontFamily: "Galmuri11", backgroundColor: "#f0f2f5", minHeight: "100vh",
+  container: {
+    padding: "60px 20px", fontFamily: "Galmuri11", backgroundColor: "#f0f2f5", minHeight: "100vh",
     backgroundImage: "url('/images/bg2.png')",
     backgroundSize: 'cover', backgroundPosition: 'center', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'
-   },
+  },
   userInfo: { position: "absolute", top: 20, right: 20, fontSize: "14px", color: "#888", backgroundColor: "white", padding: '0px 10px' },
   gameBox: { marginTop: "130px", maxWidth: "800px", margin: "0 auto", textAlign: "center", backgroundColor: "white", padding: "50px", borderRadius: "20px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" },
   subBox: { height: "30px", fontSize: "18px", color: "#ddd", margin: "10px 0" },
   mainBox: { fontSize: "32px", fontWeight: "bold", margin: "25px 0", minHeight: "45px", letterSpacing: "1px" },
-  inputContainer: { position: "relative", width: "90%", margin: "0 auto", height: "55px", border: "2px solid #eee", borderRadius: "10px", display: "flex", alignItems: "center", overflow: "hidden",
+  inputContainer: {
+    position: "relative", width: "90%", margin: "0 auto", height: "55px", border: "2px solid #eee", borderRadius: "10px", display: "flex", alignItems: "center", overflow: "hidden",
     backgroundImage: "url('/images/input.png')", backgroundSize: "cover",
     backgroundPosition: "center",
-   },
+  },
   hiddenInput: { position: "absolute", width: "100%", height: "100%", opacity: 0, zIndex: 2, cursor: "text", border: "none", outline: "none" },
   fakeInput: { padding: "0 15px", fontSize: "22px", textAlign: "left", width: "100%", whiteSpace: "pre", pointerEvents: "none" },
   cursor: { color: "#007bff", fontWeight: "bold", marginLeft: "2px" },
@@ -338,17 +427,13 @@ const styles = {
   modalOverlay: { position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.7)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 },
   modal: { backgroundColor: "white", padding: "40px", borderRadius: "20px", width: "320px", boxShadow: "0 20px 40px rgba(0,0,0,0.3)", fontFamily: 'Galmuri9' },
   resultRow: { display: "flex", justifyContent: "space-between", margin: "15px 0", fontSize: "18px", borderBottom: "1px solid #f5f5f5", paddingBottom: "5px" },
-  btnGroup: {display: "flex", gap: "10px", marginTop: "20px", fontFamily: 'Galmuri11'},
-  btn: {flex: 1, padding: "12px", backgroundColor: "#c36fff", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: "bold"},
+  noticeRow: { fontSize: "13px", color: "#e53935", textAlign: "center", margin: "10px 0" },
+  btnGroup: { display: "flex", gap: "10px", marginTop: "20px", fontFamily: 'Galmuri11' },
+  btn: { flex: 1, padding: "12px", backgroundColor: "#c36fff", color: "white", border: "none", borderRadius: "10px", cursor: "pointer", fontSize: "14px", fontWeight: "bold" },
   rankHighlight: {
     backgroundColor: "#fff176", padding: "5px",
     display: "flex", justifyContent: "space-between", margin: "10px 0", fontSize: "18px", borderBottom: "1px solid #f5f5f5",
   },
-  // rankValue: {
-  //   color: "#d32f2f",
-  //   fontSize: "26px",
-  //   margin: "0 5px"
-  // },
 };
 
 export default Game;
