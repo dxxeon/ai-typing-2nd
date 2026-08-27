@@ -16,24 +16,25 @@ import {
 
 const lineSets = {
   set1: [
-    "아이들은 누구나 마음 속에 알을 가지고 있다",
-    "charac charac change!",
-    "charac charac change!",
-    "another character go for you~",
-    "있는 그대로 나의 모습을 보여주는 게 싫었어",
-    "하늘의 작은 별들도 제 빛을 비추는데",
-    "날 몰라줘도 날 오해해도 언젠간 날 보여줄게",
-    "널 사랑해도 말 못했던 나",
-    "달라질게 솔직한 날 기대해",
-    "I can change the charac and motion",
-    "내가 가진 또 다른 모습",
-    "숨겨왔었던 모든 내 사랑들을",
-    "이젠 보여줄 수 있는 걸",
-    "I can feel the Happy emotion",
-    "내가 또 다른 사랑인 거야",
-    "나를 가렸던 기억 이젠 모두 다 바꿔줘",
-    "charac charac change!",
-    "행복하도록",
+    "오호 통재라! 만천하 벗들에게",
+    "피를 토하는 심정으로 엄히 고하노라.",
+    "근래 대이화의 굳건한 기강을 뒤흔드는",
+    "요망한 무리들이 창궐하니,",
+    "이른바 앞에서는 백지를 주창하면서",
+    "뒤로는 아산당과 이시시 구석에서",
+    "전공 서책을 펼치는 참람한 뒷공부 무리로다.",
+    "음흉히 뒷공부를 하는 것은",
+    "곧 학업이라는 오랑캐와 화친하는 것이요",
+    "달콤한 화친에 속아 몰래 책을 펴는 것은,",
+    "함께 붓을 꺾기로 맹세한 벗들을 배신하고",
+    "평균을 높이는 참담한 매학 행위로다.",
+    "대저 학업이라 함은 우리의 평안과",
+    "젊음을 갉아먹는 간악한 외세이거늘,",
+    "어찌하여 입으로는 망하였다 하면서",
+    "야반심경에 홀로 족보를 암송한단 말이더냐.",
+    "진정 시험을 버린 자라면 마땅히 책을 불태우고",
+    "조용히 재수강의 길을 걸어야 할 터.",
+    "이에 본인은 위정척학의 결기로 선포하노라.",
   ],
   set2: [
     "감옥에~~~서 누가 돌아왔~~~게",
@@ -59,25 +60,24 @@ const lineSets = {
     "검은 흑곰은 피에 굶주려 있다는 사실을.",
   ],
   set3: [
-    "오호 통재라! 만천하 벗들에게",
-    "피를 토하는 심정으로 엄히 고하노라.",
-    "근래 대이화의 굳건한 기강을 뒤흔드는",
-    "요망한 무리들이 창궐하니,",
-    "이른바 앞에서는 백지를 주창하면서",
-    "뒤로는 아산당과 이시시 구석에서",
-    "전공 서책을 펼치는 참람한 뒷공부 무리로다.",
-    "음흉히 뒷공부를 하는 것은",
-    "곧 학업이라는 오랑캐와 화친하는 것이요",
-    "달콤한 화친에 속아 몰래 책을 펴는 것은,",
-    "함께 붓을 꺾기로 맹세한 벗들을 배신하고",
-    "평균을 높이는 참담한 매학 행위로다.",
-    "대저 학업이라 함은 우리의 평안과",
-    "젊음을 갉아먹는 간악한 외세이거늘,",
-    "어찌하여 입으로는 망하였다 하면서",
-    "야반심경에 홀로 족보를 암송한단 말이더냐.",
-    "진정 시험을 버린 자라면 마땅히 책을 불태우고",
-    "조용히 재수강의 길을 걸어야 할 터.",
-    "이에 본인은 위정척학의 결기로 선포하노라.",
+    "아이들은 누구나 마음 속에 알을 가지고 있다",
+    "charac charac change!",
+    "charac charac change!",
+    "another character go for you~",
+    "있는 그대로 나의 모습을 보여주는 게 싫었어",
+    "하늘의 작은 별들도 제 빛을 비추는데",
+    "날 몰라줘도 날 오해해도 언젠간 날 보여줄게",
+    "널 사랑해도 말 못했던 나",
+    "달라질게 솔직한 날 기대해",
+    "I can change the charac and motion",
+    "내가 가진 또 다른 모습",
+    "숨겨왔었던 모든 내 사랑들을",
+    "이젠 보여줄 수 있는 걸",
+    "I can feel the Happy emotion",
+    "내가 또 다른 사랑인 거야",
+    "나를 가렸던 기억 이젠 모두 다 바꿔줘",
+    "charac charac change!",
+    "행복하도록",
   ],
 };
 
@@ -126,7 +126,7 @@ function Game() {
   const isComposingRef = useRef(false);
 
   const setNames = {
-    set1: "캐캐체", set2: "안전귀가", set3: "척학비"
+    set1: "척학비", set2: "흑곰", set3: "캐캐체"
   }
 
   // -----------------------------
@@ -343,6 +343,7 @@ function Game() {
       <div style={styles.userInfo}>{studentId} · {name} / {group}</div>
 
       <div style={styles.gameBox}>
+        <div style={styles.lineProgress}>{currentLine + 1}/{lines.length}</div>
         <div style={styles.subBox}>{lines[currentLine - 1] || ""}</div>
         <div style={styles.mainBox}>{renderTargetLine()}</div>
         <div style={styles.subBox}>{lines[currentLine + 1] || ""}</div>
@@ -416,7 +417,8 @@ const styles = {
     backgroundSize: 'cover', backgroundPosition: 'center', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'
   },
   userInfo: { position: "absolute", top: 20, right: 20, fontSize: "14px", color: "#888", backgroundColor: "white", padding: '0px 10px' },
-  gameBox: { marginTop: "130px", maxWidth: "800px", margin: "0 auto", textAlign: "center", backgroundColor: "white", padding: "50px", borderRadius: "20px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" },
+  gameBox: { position: "relative", marginTop: "130px", maxWidth: "800px", margin: "0 auto", textAlign: "center", backgroundColor: "white", padding: "50px", borderRadius: "20px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" },
+  lineProgress: { position: "absolute", top: "20px", right: "30px", fontSize: "16px", fontWeight: "bold", color: "#888", fontFamily: "Galmuri11" },
   subBox: { height: "30px", fontSize: "18px", color: "#ddd", margin: "10px 0" },
   mainBox: { fontSize: "32px", fontWeight: "bold", margin: "25px 0", minHeight: "45px", letterSpacing: "1px" },
   inputContainer: {
