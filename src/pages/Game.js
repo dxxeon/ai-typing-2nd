@@ -343,6 +343,7 @@ function Game() {
       <div style={styles.userInfo}>{studentId} · {name} / {group}</div>
 
       <div style={styles.gameBox}>
+        <div style={styles.lineProgress}>{currentLine + 1}/{lines.length}</div>
         <div style={styles.subBox}>{lines[currentLine - 1] || ""}</div>
         <div style={styles.mainBox}>{renderTargetLine()}</div>
         <div style={styles.subBox}>{lines[currentLine + 1] || ""}</div>
@@ -416,7 +417,8 @@ const styles = {
     backgroundSize: 'cover', backgroundPosition: 'center', justifyContent: 'center', alignItems: 'center', flexDirection: 'column'
   },
   userInfo: { position: "absolute", top: 20, right: 20, fontSize: "14px", color: "#888", backgroundColor: "white", padding: '0px 10px' },
-  gameBox: { marginTop: "130px", maxWidth: "800px", margin: "0 auto", textAlign: "center", backgroundColor: "white", padding: "50px", borderRadius: "20px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" },
+  gameBox: { position: "relative", marginTop: "130px", maxWidth: "800px", margin: "0 auto", textAlign: "center", backgroundColor: "white", padding: "50px", borderRadius: "20px", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" },
+  lineProgress: { position: "absolute", top: "20px", right: "30px", fontSize: "16px", fontWeight: "bold", color: "#888", fontFamily: "Galmuri11" },
   subBox: { height: "30px", fontSize: "18px", color: "#ddd", margin: "10px 0" },
   mainBox: { fontSize: "32px", fontWeight: "bold", margin: "25px 0", minHeight: "45px", letterSpacing: "1px" },
   inputContainer: {
