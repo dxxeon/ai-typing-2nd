@@ -81,9 +81,9 @@ function Home() {
             style={{ ...styles.select, border: "2px solid #c36fff" }}
           >
             <option value="" style={{ color: "#888" }}>세트 선택</option>
-            <option value="set1">캐캐체 ★</option>
-            <option value="set2">안전귀가 ★★</option>
-            <option value="set3">척학비 ★★★</option>
+            <option value="set1">척학비 ★</option>
+            <option value="set2">흑곰 ★★</option>
+            <option value="set3">캐캐체 ★★★</option>
           </select>
         </div>
 

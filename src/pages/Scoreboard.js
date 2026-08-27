@@ -90,15 +90,15 @@ function Scoreboard() {
             <button
               onClick={() => setCurrentTab("set1")}
               style={currentTab === "set1" ? styles.activeTab : styles.tab}
-            >캐캐체</button>
+            >척학비</button>
             <button
               onClick={() => setCurrentTab("set2")}
               style={currentTab === "set2" ? styles.activeTab : styles.tab}
-            >안전귀가</button>
+            >흑곰</button>
             <button
               onClick={() => setCurrentTab("set3")}
               style={currentTab === "set3" ? styles.activeTab : styles.tab}
-            >척학비</button>
+            >캐캐체</button>
             <button
               onClick={() => navigate("/")}
               style={styles.homeTabBtn}
